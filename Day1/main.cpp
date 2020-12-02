@@ -1,26 +1,6 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
+#include "../utils.cpp"
 
 using namespace std;
-
-static vector<string> readData(string filePath)
-{
-    vector<string> data;
-    string line;
-    ifstream file(filePath);
-    if (file.is_open())
-    {
-        while (!file.eof())
-        {
-            getline(file, line);
-            data.push_back(line);
-        }
-        file.close();
-    }
-    return data;
-}
 
 int main()
 {
