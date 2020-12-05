@@ -22,11 +22,23 @@ int bisect(string input, int end)
 int main()
 {
     int highestSeatId = 0;
+    int seats[127][7];
+
     for (string line : readData("./input.txt"))
     {
-        int seatId = 8 * bisect(line.substr(0, 7), 127) + bisect(line.substr(7), 7);
+        int rowId = bisect(line.substr(0, 7), 127);
+        int colId = bisect(line.substr(7), 7);
+        seats[rowId][colId] = 1;
+        int seatId = 8 * rowId + colId;
         highestSeatId = max(highestSeatId, seatId);
     }
 
-    cout << "the answer to part 1 is: " << highestSeatId;
+    int mySeatId;
+    for (int i = 1; i < 119; i++)
+        for (int j = 0; j < 7; j++)
+            if (seats[i][j] != 1)
+                mySeatId = 8 * i + j;
+
+    cout << "the answer to part 1 is: " << highestSeatId << endl;
+    cout << "the answer to part 2 is: " << mySeatId << endl;
 }
