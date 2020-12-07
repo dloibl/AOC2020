@@ -5,24 +5,21 @@
 
 using namespace std;
 
+const regex aNumber("([0-9]+)");
+
 struct Bag
 {
     string name;
-    vector<Bag> contains;
+    map<string, int> contains;
 
     Bag(string name)
     {
         this->name = name;
     }
 
-    void addBag(Bag &other)
+    void addBag(string &other, int count)
     {
-        this->contains.push_back(other);
-    }
-
-    int size()
-    {
-        return this->contains.size();
+        this->contains.insert(pair<string, int>(other, count));
     }
 };
 
@@ -41,15 +38,32 @@ void searchBags(map<string, Bag> &bags, set<string> &result, string key = "shiny
     for (map<string, Bag>::iterator i = bags.begin(); i != bags.end(); i++)
     {
         Bag bag = i->second;
-        for (Bag other : bag.contains)
+        map<string, int>::iterator iter = bag.contains.find(key);
+        if (iter != bag.contains.end())
         {
-            if (other.name == key)
-            {
-                result.insert(bag.name);
-                searchBags(bags, result, bag.name);
-            }
+            result.insert(bag.name);
+            searchBags(bags, result, bag.name);
         }
     }
+}
+
+int countBags(map<string, Bag> &bags, string key = "shiny gold")
+{
+    Bag bag = bags.at(key);
+
+    if (bag.contains.size() == 0)
+    {
+        return 1;
+    }
+
+    int nested = 0;
+    for (map<string, int>::iterator i = bag.contains.begin(); i != bag.contains.end(); i++)
+    {
+        int mult = i->second;
+        string next = i->first;
+        nested += mult * countBags(bags, next);
+    }
+    return nested + 1;
 }
 
 int main()
@@ -67,19 +81,29 @@ int main()
 
         for (string containsBag : split(contains, ','))
         {
-            string normalized = regex_replace(containsBag, regex("[0-9]"), "");
+            smatch matches;
+            int count;
+            if (regex_search(containsBag, matches, aNumber))
+            {
+                count = stoi(matches[1]);
+            }
+
+            string normalized = regex_replace(containsBag, aNumber, "");
             normalized = trim(normalized);
             if (normalized != "no other")
             {
                 maybeCreateBag(bags, normalized);
-                bags.at(currentBag).addBag(bags.at(normalized));
+                bags.at(currentBag).addBag(normalized, count);
             }
         }
     }
 
-    set<string> result;
+    set<string> resultPart1;
+    searchBags(bags, resultPart1);
 
-    searchBags(bags, result);
+    // part 2:
+    int resultPart2 = countBags(bags) - 1;
 
-    cout << "the answer to part 1 is: " << result.size() << endl;
+    cout << "the answer to part 1 is: " << resultPart1.size() << endl;
+    cout << "the answer to part 2 is: " << resultPart2 << endl;
 }
