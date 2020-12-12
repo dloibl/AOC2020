@@ -3,21 +3,21 @@
 
 using namespace std;
 
-void move(char &direction, int &x, int &y, int &value)
+void move(char &direction, int &a, int &b, int &value)
 {
     switch (direction)
     {
     case 'N':
-        y += value;
+        b += value;
         break;
     case 'S':
-        y -= value;
+        b -= value;
         break;
     case 'E':
-        x += value;
+        a += value;
         break;
     case 'W':
-        x -= value;
+        a -= value;
         break;
     }
 }
@@ -36,20 +36,55 @@ void turn(char &direction, char &facing, int &value)
 
 int main()
 {
+    int part1x = 0;
+    int part1y = 0;
+    char facing = 'E';
     int x = 0;
     int y = 0;
-    char facing = 'E';
+    int wx = 10;
+    int px, py;
+    int wy = 1;
     for (const auto &data : readData("./input.txt"))
     {
         char instruction = data[0];
         int value = stoi(data.substr(1, data.size()));
         if (instruction == 'F')
-            move(facing, x, y, value);
+        {
+            move(facing, part1x, part1y, value);
+            //part2
+            x += value * (wx);
+            y += value * (wy);
+        }
         else if (instruction == 'L' || instruction == 'R')
+        {
             turn(instruction, facing, value);
+            // part2
+            if ((instruction == 'R' && value == 90) || (instruction == 'L' && value == 270))
+            {
+                px = (wy);
+                py = -(wx);
+            }
+            else if ((instruction == 'L' && value == 90) || (instruction == 'R' && value == 270))
+            {
+                px = -(wy);
+                py = (wx);
+            }
+            else if (value == 180)
+            {
+                px = -(wx);
+                py = -(wy);
+            }
+            wx = px;
+            wy = py;
+        }
         else
-            move(instruction, x, y, value);
+        {
+            //part1
+            move(instruction, part1x, part1y, value);
+            //part2
+            move(instruction, wx, wy, value);
+        }
     }
-
-    cout << "the answer to part 1 is: " << (abs(x) + abs(y)) << endl;
+    cout << "the answer to part 1 is: " << (abs(part1x) + abs(part1y)) << endl;
+    cout << "the answer to part 2 is: " << (abs(x) + abs(y)) << endl;
 }
