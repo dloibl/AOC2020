@@ -1,27 +1,53 @@
 #include "../utils.cpp"
-#include <set>
+#include <map>
+
 using namespace std;
 
 int main()
 {
     vector<string> startingNumbers = split(readData("./input.txt")[0], ',');
+    map<int, pair<int, int>> spoken;
+    int part1Word;
     int turn = 1;
-    vector<int> spoken;
+    int nextWord;
+    int lastWord;
     for (auto start : startingNumbers)
     {
-        spoken.push_back(stoi(start));
+        auto w = stoi(start);
+        spoken[w] = pair(turn, 0);
+        cout << "t:" << turn << " = " << w << endl;
+        lastWord = w;
         turn++;
     }
 
-    int nextWord;
-    while (turn < 2021)
+    pair<int, int> last;
+    pair<int, int> next;
+
+    while (turn < 30000001)
     {
-        auto last = spoken.back();
-        auto it = find(spoken.rbegin() + 1, spoken.rend(), last);
-        nextWord = it == spoken.rend() ? 0 : (turn - 1) - distance(it, spoken.rend());
-        spoken.push_back(nextWord);
+        if (turn == 2021)
+        {
+            part1Word = lastWord;
+        }
+
+        last = spoken[lastWord];
+        nextWord = !last.second ? 0 : last.second - last.first;
+        next = spoken[nextWord];
+        if (!next.first)
+        {
+            spoken[nextWord] = pair(turn, 0);
+        }
+        else
+        {
+            if (next.second)
+                spoken[nextWord].first = next.second;
+            spoken[nextWord].second = turn;
+        }
+
+        lastWord = nextWord;
         turn++;
     }
 
-    cout << "the answer to part 1 is: " << nextWord << endl;
+    cout << "the answer to part 1 is: " << part1Word << endl;
+    cout << "the answer to part 2 is: " << nextWord << endl;
 }
