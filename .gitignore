@@ -34,4 +34,7 @@ main
 
 #vscode
 .vscode
-main.dSYM
+*.dSYM
+*.ilk
+*.pdb
+
